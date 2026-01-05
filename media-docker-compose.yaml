@@ -1,0 +1,158 @@
+name: 'media'
+
+services:
+  qbittorrent:
+    image: linuxserver/qbittorrent:latest
+    restart: unless-stopped
+    environment:
+      - TZ=America/Recife
+      - WEBUI_PORT=8080
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - ~/qbittorrent/config:/config
+      - /mnt/dados/Downloads/torrents:/downloads
+    ports:
+      - '8080:8080'
+      - '62609:62609'
+    networks:
+      - nginx
+
+  jackett:
+    image: ghcr.io/linuxserver/jackett:latest
+    restart: unless-stopped
+    environment:
+      - TZ=America/Recife
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - ~/jackett/downloads:/downloads
+      - ~/jackett/config:/config
+    ports:
+      - '9117:9117'
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
+    networks:
+      - nginx
+
+  bazarr:
+    image: ghcr.io/linuxserver/bazarr:latest
+    restart: unless-stopped
+    environment:
+      - TZ=America/Recife
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /mnt/dados/Videos/radarr:/movies
+      - /mnt/dados/Videos/sonarr:/tv
+      - ~/bazarr/appdata/config:/config
+    ports:
+      - '6767:6767'
+    networks:
+      - nginx
+
+  overseerr:
+    image: sctx/overseerr
+    restart: unless-stopped
+    depends_on:
+      - qbittorrent
+    environment:
+      - TZ=America/Recife
+      - PORT=5055
+    volumes:
+      - ~/overseerr/config:/app/config
+    ports:
+      - '5055:5055'
+    networks:
+      - nginx
+
+  prowlarr:
+    image: ghcr.io/hotio/prowlarr:latest
+    restart: unless-stopped
+    depends_on:
+      - flaresolverr
+    environment:
+      - TZ=America/Recife
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - ~/prowlarr/config:/config
+      - ./torrentio.yml:/var/lib/Definitions/Custom/torrentio.yml
+    ports:
+      - '9696:9696'
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
+    networks:
+      - nginx 
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    restart: unless-stopped
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_HTML=${LOG_HTML:-false}
+      - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+      - TZ=America/Recife
+    volumes:
+      - ~/flaresolverr/config:/config
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1 # Disable ipv6 to prevent some problems
+    ports:
+      - '8191:8191'
+    networks:
+      - nginx
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    restart: unless-stopped
+    environment:
+      - TZ=America/Recife
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /mnt/dados/Downloads/nzbget:/downloads
+      - /mnt/dados/Downloads/nzbget/incomplete:/incomplete-downloads
+      - ~/nzbget/config:/config
+    ports:
+      - '6789:6789'
+    networks:
+      - nginx
+
+  radarr:
+    image: ghcr.io/linuxserver/radarr:latest
+    restart: unless-stopped
+    depends_on:
+      - qbittorrent
+    environment:
+      - TZ=America/Recife
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - ~/radarr/appdata/config:/config
+      - /mnt/dados/Downloads/torrents:/downloads
+      - /mnt/dados/Videos/radarr/movies:/movies
+      - /mnt/dados/Videos/radarr/anime:/anime
+    ports:
+      - '7878:7878'
+    networks:
+      - nginx
+
+  sonarr:
+    image: ghcr.io/linuxserver/sonarr:latest
+    restart: unless-stopped
+    depends_on:
+      - qbittorrent
+    environment:
+      - TZ=America/Recife
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - ~/sonarr/appdata/config:/config
+      - /mnt/dados/Videos/sonarr:/tv
+      - /mnt/dados/Downloads/torrents:/downloads
+    ports:
+      - '8989:8989'
+    networks:
+      - nginx
