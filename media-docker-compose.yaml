@@ -12,7 +12,7 @@ services:
     restart: unless-stopped
     hostname: torrent
     environment:
-      - TZ=America/Recife
+      - TZ=${TIMEZONE}
       - WEBUI_PORT=8080
       - PUID=1000
       - PGID=1000
@@ -31,7 +31,7 @@ services:
     hostname: jackett
     restart: unless-stopped
     environment:
-      - TZ=America/Recife
+      - TZ=${TIMEZONE}
       - PUID=1000
       - PGID=1000
     volumes:
@@ -50,7 +50,7 @@ services:
     hostname: bazarr
     restart: unless-stopped
     environment:
-      - TZ=America/Recife
+      - TZ=${TIMEZONE}
       - PUID=1000
       - PGID=1000
     volumes:
@@ -69,7 +69,7 @@ services:
     depends_on:
       - qbittorrent
     environment:
-      - TZ=America/Recife
+      - TZ=${TIMEZONE}
       - PORT=5055
     volumes:
       - ~/overseerr/config:/app/config
@@ -85,7 +85,7 @@ services:
     depends_on:
       - flaresolverr
     environment:
-      - TZ=America/Recife
+      - TZ=${TIMEZONE}
       - PUID=1000
       - PGID=1000
     volumes:
@@ -107,7 +107,7 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - LOG_HTML=${LOG_HTML:-false}
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
-      - TZ=America/Recife
+      - TZ=${TIMEZONE}
     volumes:
       - ~/flaresolverr/config:/config
     sysctls:
@@ -123,7 +123,7 @@ services:
     hostname: sabnzbd
     restart: unless-stopped
     environment:
-      - TZ=America/Recife
+      - TZ=${TIMEZONE}
       - PUID=1000
       - PGID=1000
     volumes:
@@ -142,7 +142,7 @@ services:
     depends_on:
       - qbittorrent
     environment:
-      - TZ=America/Recife
+      - TZ=${TIMEZONE}
       - PUID=1000
       - PGID=1000
     volumes:
@@ -162,7 +162,7 @@ services:
     depends_on:
       - qbittorrent
     environment:
-      - TZ=America/Recife
+      - TZ=${TIMEZONE}
       - PUID=1000
       - PGID=1000
     volumes:
