@@ -11,6 +11,7 @@ services:
     image: linuxserver/qbittorrent:latest
     restart: unless-stopped
     hostname: torrent
+    container_name: torrent
     environment:
       - TZ=${TIMEZONE}
       - WEBUI_PORT=8080
@@ -18,7 +19,7 @@ services:
       - PGID=1000
     volumes:
       - ~/qbittorrent/config:/config
-      - /mnt/dados/Downloads/torrents:/downloads
+      - /mnt/dados/media:/downloads
     ports:
       - '8080:8080'
       - '62609:62609'
@@ -29,6 +30,7 @@ services:
   jackett:
     image: ghcr.io/linuxserver/jackett:latest
     hostname: jackett
+    container_name: jackett
     restart: unless-stopped
     environment:
       - TZ=${TIMEZONE}
@@ -48,39 +50,24 @@ services:
   bazarr:
     image: ghcr.io/linuxserver/bazarr:latest
     hostname: bazarr
+    container_name: bazarr
     restart: unless-stopped
     environment:
       - TZ=${TIMEZONE}
       - PUID=1000
       - PGID=1000
     volumes:
-      - /mnt/dados/Videos/radarr:/movies
-      - /mnt/dados/Videos/sonarr:/tv
+      - /mnt/dados/media:/movies
       - ~/bazarr/appdata/config:/config
     ports:
       - '6767:6767'
     networks:
       - proxy-net
 
-  overseerr:
-    image: sctx/overseerr
-    hostname: overseer
-    restart: unless-stopped
-    depends_on:
-      - qbittorrent
-    environment:
-      - TZ=${TIMEZONE}
-      - PORT=5055
-    volumes:
-      - ~/overseerr/config:/app/config
-    ports:
-      - '5055:5055'
-    networks:
-      - proxy-net
-
   prowlarr:
     image: ghcr.io/hotio/prowlarr:latest
     hostname: prowlarr
+    container_name: prowlarr
     restart: unless-stopped
     depends_on:
       - flaresolverr
@@ -102,6 +89,7 @@ services:
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     hostname: flaresolverr
+    container_name: flaresolverr
     restart: unless-stopped
     environment:
       - LOG_LEVEL=${LOG_LEVEL:-info}
@@ -117,27 +105,10 @@ services:
     networks:
       - proxy-net
 
-
-  sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd:latest
-    hostname: sabnzbd
-    restart: unless-stopped
-    environment:
-      - TZ=${TIMEZONE}
-      - PUID=1000
-      - PGID=1000
-    volumes:
-      - /mnt/dados/Downloads/nzbget:/downloads
-      - /mnt/dados/Downloads/nzbget/incomplete:/incomplete-downloads
-      - ~/nzbget/config:/config
-    ports:
-      - '6789:6789'
-    networks:
-      - proxy-net
-
   radarr:
     image: ghcr.io/linuxserver/radarr:latest
     hostname: radarr
+    container_name: radarr
     restart: unless-stopped
     depends_on:
       - qbittorrent
@@ -147,9 +118,7 @@ services:
       - PGID=1000
     volumes:
       - ~/radarr/appdata/config:/config
-      - /mnt/dados/Downloads/torrents:/downloads
-      - /mnt/dados/Videos/radarr/movies:/movies
-      - /mnt/dados/Videos/radarr/anime:/anime
+      - /mnt/dados/media:/media
     ports:
       - '7878:7878'
     networks:
@@ -158,6 +127,7 @@ services:
   sonarr:
     image: ghcr.io/linuxserver/sonarr:latest
     hostname: sonarr
+    container_name: sonarr
     restart: unless-stopped
     depends_on:
       - qbittorrent
@@ -167,9 +137,43 @@ services:
       - PGID=1000
     volumes:
       - ~/sonarr/appdata/config:/config
-      - /mnt/dados/Videos/sonarr:/tv
-      - /mnt/dados/Downloads/torrents:/downloads
+      - /mnt/dados/media:/media
     ports:
       - '8989:8989'
     networks:
       - proxy-net
+
+  # sabnzbd:
+  #   image: lscr.io/linuxserver/sabnzbd:latest
+  #   hostname: sabnzbd
+  # container_name: sabnzbd
+  #   restart: unless-stopped
+  #   environment:
+  #     - TZ=${TIMEZONE}
+  #     - PUID=1000
+  #     - PGID=1000
+  #   volumes:
+  #     - /mnt/dados/Downloads/nzbget:/downloads
+  #     - /mnt/dados/Downloads/nzbget/incomplete:/incomplete-downloads
+  #     - ~/nzbget/config:/config
+  #   ports:
+  #     - '6789:6789'
+  #   networks:
+  #     - proxy-net
+
+  # overseerr:
+  #   image: sctx/overseerr
+  #   hostname: overseer
+  # container_name: overseer
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - qbittorrent
+  #   environment:
+  #     - TZ=${TIMEZONE}
+  #     - PORT=5055
+  #   volumes:
+  #     - ~/overseerr/config:/app/config
+  #   ports:
+  #     - '5055:5055'
+  #   networks:
+  #     - proxy-net
