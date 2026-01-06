@@ -1,9 +1,16 @@
 name: 'media'
 
+networks:
+  proxy-net:
+    name: proxy-net
+    driver: bridge
+    external: true
+
 services:
   qbittorrent:
     image: linuxserver/qbittorrent:latest
     restart: unless-stopped
+    hostname: torrent
     environment:
       - TZ=America/Recife
       - WEBUI_PORT=8080
@@ -16,10 +23,12 @@ services:
       - '8080:8080'
       - '62609:62609'
     networks:
-      - nginx
+      - proxy-net
+
 
   jackett:
     image: ghcr.io/linuxserver/jackett:latest
+    hostname: jackett
     restart: unless-stopped
     environment:
       - TZ=America/Recife
@@ -34,10 +43,11 @@ services:
       - 1.1.1.1
       - 1.0.0.1
     networks:
-      - nginx
+      - proxy-net
 
   bazarr:
     image: ghcr.io/linuxserver/bazarr:latest
+    hostname: bazarr
     restart: unless-stopped
     environment:
       - TZ=America/Recife
@@ -50,10 +60,11 @@ services:
     ports:
       - '6767:6767'
     networks:
-      - nginx
+      - proxy-net
 
   overseerr:
     image: sctx/overseerr
+    hostname: overseer
     restart: unless-stopped
     depends_on:
       - qbittorrent
@@ -65,10 +76,11 @@ services:
     ports:
       - '5055:5055'
     networks:
-      - nginx
+      - proxy-net
 
   prowlarr:
     image: ghcr.io/hotio/prowlarr:latest
+    hostname: prowlarr
     restart: unless-stopped
     depends_on:
       - flaresolverr
@@ -85,10 +97,11 @@ services:
       - 1.1.1.1
       - 1.0.0.1
     networks:
-      - nginx 
+      - proxy-net
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
+    hostname: flaresolverr
     restart: unless-stopped
     environment:
       - LOG_LEVEL=${LOG_LEVEL:-info}
@@ -102,10 +115,12 @@ services:
     ports:
       - '8191:8191'
     networks:
-      - nginx
+      - proxy-net
+
 
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
+    hostname: sabnzbd
     restart: unless-stopped
     environment:
       - TZ=America/Recife
@@ -118,10 +133,11 @@ services:
     ports:
       - '6789:6789'
     networks:
-      - nginx
+      - proxy-net
 
   radarr:
     image: ghcr.io/linuxserver/radarr:latest
+    hostname: radarr
     restart: unless-stopped
     depends_on:
       - qbittorrent
@@ -137,10 +153,11 @@ services:
     ports:
       - '7878:7878'
     networks:
-      - nginx
+      - proxy-net
 
   sonarr:
     image: ghcr.io/linuxserver/sonarr:latest
+    hostname: sonarr
     restart: unless-stopped
     depends_on:
       - qbittorrent
@@ -155,4 +172,4 @@ services:
     ports:
       - '8989:8989'
     networks:
-      - nginx
+      - proxy-net

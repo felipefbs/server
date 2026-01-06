@@ -1,34 +1,24 @@
 name: 'net'
 
+networks:
+  proxy-net:
+    name: proxy-net
+    driver: bridge
+    external: true
+
 services:
   nginx:
-    image: 'jc21/nginx-proxy-manager:latest'
-    restart: unless-stopped
-
+    image: nginx:latest
+    container_name: nginx
     ports:
-      # These ports are in format <host-port>:<container-port>
-      - '80:80' # Public HTTP Port
-      - '443:443' # Public HTTPS Port
-      - '81:81' # Admin Web Port
-      # Add any other Stream port you want to expose
-      # - '21:21' # FTP
-
-    environment:
-      TZ: "America/Recife"
-
-      # Uncomment this if you want to change the location of
-      # the SQLite DB file within the container
-      # DB_SQLITE_FILE: "/data/database.sqlite"
-
-      # Uncomment this if IPv6 is not enabled on your host
-      # DISABLE_IPV6: 'true'
-
+    - "80:80"
     volumes:
-      - ./data:/data
-      - ./letsencrypt:/etc/letsencrypt
+    - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
-          - nginx
+      - proxy-net
+
   cloudflared:
+    container_name: cloudflared
     image: visibilityspots/cloudflared:latest
     restart: unless-stopped
     environment:
@@ -37,9 +27,8 @@ services:
       - PORT=5054
       - ADDRESS=0.0.0.0
       - METRICS=127.0.0.1:8088
-    network_mode: host
     networks:
-      - nginx
+      - proxy-net
   
   pihole:
     container_name: pihole
@@ -49,7 +38,7 @@ services:
       - "53:53/tcp"
       - "53:53/udp"
       # Default HTTP Port
-      # - "80:80/tcp"
+      - "42069:80/tcp"
       # Default HTTPs Port. FTL will generate a self-signed certificate
       # - "443:443/tcp"
       # Uncomment the below if using Pi-hole as your DHCP Server
@@ -80,8 +69,4 @@ services:
       - SYS_NICE
     restart: unless-stopped
     networks:
-      - nginx
-
-networks:
-  nginx:
-    driver: bridge
+      - proxy-net

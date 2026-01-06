@@ -1,6 +1,15 @@
+name: 'octoprint'
+
+networks:
+  proxy-net:
+    name: proxy-net
+    driver: bridge
+    external: true
+
 services:
   octoprint:
     image: octoprint/octoprint
+    hostname: octoprint
     restart: unless-stopped
     ports:
       - 8181:80
@@ -15,6 +24,8 @@ services:
     # you add a video device
     environment:
       - ENABLE_MJPG_STREAMER=true
+    networks:
+      - proxy-net
   ####
   # uncomment if you wish to edit the configuration files of octoprint
   # refer to docs on configuration editing for more information

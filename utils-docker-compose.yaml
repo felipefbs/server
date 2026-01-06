@@ -3,9 +3,16 @@ name: 'utils'
 volumes:
   portainer_data:
 
+networks:
+  proxy-net:
+    name: proxy-net
+    driver: bridge
+    external: true
+
 services:
   portainer:
     image: portainer/portainer-ce:latest
+    hostname: portainer
     restart: unless-stopped
     volumes:
       - portainer_data:/data
@@ -13,9 +20,10 @@ services:
     ports:
       - '9000:9000'
     networks:
-      - nginx
+      - proxy-net
   librespeed:
     image: lscr.io/linuxserver/librespeed:latest
+    hostname: speedtest
     restart: unless-stopped
     environment:
       - TZ=America/Sao_Paulo
@@ -26,7 +34,7 @@ services:
     ports:
       - '9091:80'
     networks:
-      - nginx
+      - proxy-net
 #  organizr:
 #    image: organizr/organizr:latest
 #    restart: unless-stopped
