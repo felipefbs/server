@@ -8,20 +8,6 @@ services:
         condition: service_healthy
       cloudflared:
         condition: service_healthy
-      qbittorrent:
-        condition: service_healthy
-      jackett:
-        condition: service_healthy
-      bazarr:
-        condition: service_healthy
-      prowlarr:
-        condition: service_healthy
-      flaresolverr:
-        condition: service_healthy
-      radarr:
-        condition: service_healthy
-      sonarr:
-        condition: service_healthy
       librespeed:
         condition: service_healthy
       homarr:
