@@ -1,6 +1,6 @@
 services:
   octoprint:
-    image: octoprint/octoprint
+    image: octoprint/octoprint:1.11.8
     hostname: octoprint
     container_name: octoprint
     restart: unless-stopped

@@ -1,6 +1,6 @@
 services:
   librespeed:
-    image: lscr.io/linuxserver/librespeed:latest
+    image: lscr.io/linuxserver/librespeed:6.1.0
     hostname: speedtest
     container_name: speedtest
     restart: unless-stopped
@@ -33,7 +33,7 @@ services:
 
   homarr:
     container_name: homarr
-    image: ghcr.io/ajnart/homarr:0.15.4
+    image: ghcr.io/ajnart/homarr:1.69.2
     restart: unless-stopped
     logging:
       driver: "json-file"
