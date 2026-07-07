@@ -1,0 +1,15 @@
+name: 'home-server'
+
+networks:
+  proxy-net:
+    name: proxy-net
+    driver: bridge
+  services-net:
+    name: services-net
+    internal: false # Needs internet for updates/downloads, but not exposed to host
+
+include:
+  - path: net-docker-compose.yaml
+  - path: media-docker-compose.yaml
+  - path: utils-docker-compose.yaml
+  - path: octoprint-docker-compose.yaml
