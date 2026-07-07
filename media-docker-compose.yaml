@@ -4,6 +4,16 @@ services:
     restart: unless-stopped
     hostname: torrent
     container_name: torrent
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
     depends_on:
       pihole:
         condition: service_healthy
@@ -31,6 +41,16 @@ services:
     hostname: jackett
     container_name: jackett
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
     depends_on:
       pihole:
         condition: service_healthy
@@ -54,6 +74,16 @@ services:
     hostname: bazarr
     container_name: bazarr
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
     depends_on:
       pihole:
         condition: service_healthy
@@ -77,6 +107,16 @@ services:
     hostname: prowlarr
     container_name: prowlarr
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
     depends_on:
       pihole:
         condition: service_healthy
@@ -102,6 +142,16 @@ services:
     hostname: flaresolverr
     container_name: flaresolverr
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
     depends_on:
       pihole:
         condition: service_healthy
@@ -127,6 +177,16 @@ services:
     hostname: radarr
     container_name: radarr
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 1G
     depends_on:
       pihole:
         condition: service_healthy
@@ -152,6 +212,16 @@ services:
     hostname: sonarr
     container_name: sonarr
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 1G
     depends_on:
       pihole:
         condition: service_healthy

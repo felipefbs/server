@@ -4,6 +4,16 @@ services:
     hostname: octoprint
     container_name: octoprint
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
     depends_on:
       pihole:
         condition: service_healthy
