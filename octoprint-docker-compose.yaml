@@ -4,6 +4,9 @@ services:
     hostname: octoprint
     container_name: octoprint
     restart: unless-stopped
+    depends_on:
+      pihole:
+        condition: service_healthy
     devices:
       - /dev/ttyUSB0:/dev/ttyACM0
       - /dev/video0:/dev/video0

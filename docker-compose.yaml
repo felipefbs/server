@@ -10,6 +10,6 @@ networks:
 
 include:
   - path: net-docker-compose.yaml
-  - path: media-docker-compose.yaml
+  # - path: media-docker-compose.yaml
   - path: utils-docker-compose.yaml
   - path: octoprint-docker-compose.yaml

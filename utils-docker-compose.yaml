@@ -1,25 +1,12 @@
 services:
-  portainer:
-    image: portainer/portainer-ce:latest
-    hostname: portainer
-    container_name: portainer
-    restart: unless-stopped
-    volumes:
-      - ${PORTAINER_DATA}:/data
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - services-net
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
   librespeed:
     image: lscr.io/linuxserver/librespeed:latest
     hostname: speedtest
     container_name: speedtest
     restart: unless-stopped
+    depends_on:
+      pihole:
+        condition: service_healthy
     environment:
       - TZ=${TIMEZONE}
       - PUID=${PUID}
@@ -34,39 +21,22 @@ services:
       timeout: 10s
       retries: 3
 
-  organizr:
-    image: organizrtools/organizr-v2:latest
-    hostname: organizr
-    container_name: organizr
-    restart: unless-stopped
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TIMEZONE}
-    volumes:
-      - ${ORGANIZR_CONFIG}:/config
-    cap_add:
-      - NET_BIND_SERVICE
-    networks:
-      - services-net
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
   homarr:
     container_name: homarr
-    image: ghcr.io/ajnart/homarr:latest
+    image: ghcr.io/ajnart/homarr:0.15.4
     restart: unless-stopped
+    depends_on:
+      pihole:
+        condition: service_healthy
+    environment:
+      - SECRET_ENCRYPTION_KEY=${AUTH_SECRET}
     volumes:
-      - ${HOMARR_CONFIG}/configs:/app/data/configs
-      - ${HOMARR_CONFIG}/icons:/app/public/icons
-      - /var/run/docker.sock:/var/run/docker.sock # Optional: for docker integration
+      - ${HOMARR_CONFIG}/appdata:/appdata
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - services-net
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:7575"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:7575"]
       interval: 30s
       timeout: 10s
       retries: 3

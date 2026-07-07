@@ -4,6 +4,9 @@ services:
     restart: unless-stopped
     hostname: torrent
     container_name: torrent
+    depends_on:
+      pihole:
+        condition: service_healthy
     environment:
       - TZ=${TIMEZONE}
       - WEBUI_PORT=8080
@@ -28,6 +31,9 @@ services:
     hostname: jackett
     container_name: jackett
     restart: unless-stopped
+    depends_on:
+      pihole:
+        condition: service_healthy
     environment:
       - TZ=${TIMEZONE}
       - PUID=${PUID}
@@ -48,6 +54,9 @@ services:
     hostname: bazarr
     container_name: bazarr
     restart: unless-stopped
+    depends_on:
+      pihole:
+        condition: service_healthy
     environment:
       - TZ=${TIMEZONE}
       - PUID=${PUID}
@@ -69,7 +78,10 @@ services:
     container_name: prowlarr
     restart: unless-stopped
     depends_on:
-      - flaresolverr
+      pihole:
+        condition: service_healthy
+      flaresolverr:
+        condition: service_healthy
     environment:
       - TZ=${TIMEZONE}
       - PUID=${PUID}
@@ -90,6 +102,9 @@ services:
     hostname: flaresolverr
     container_name: flaresolverr
     restart: unless-stopped
+    depends_on:
+      pihole:
+        condition: service_healthy
     environment:
       - LOG_LEVEL=${LOG_LEVEL}
       - LOG_HTML=${LOG_HTML}
@@ -113,7 +128,10 @@ services:
     container_name: radarr
     restart: unless-stopped
     depends_on:
-      - qbittorrent
+      pihole:
+        condition: service_healthy
+      qbittorrent:
+        condition: service_healthy
     environment:
       - TZ=${TIMEZONE}
       - PUID=${PUID}
@@ -135,7 +153,10 @@ services:
     container_name: sonarr
     restart: unless-stopped
     depends_on:
-      - qbittorrent
+      pihole:
+        condition: service_healthy
+      qbittorrent:
+        condition: service_healthy
     environment:
       - TZ=${TIMEZONE}
       - PUID=${PUID}
