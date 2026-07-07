@@ -39,7 +39,7 @@ services:
 
   cloudflared:
     container_name: cloudflared
-    image: visibilityspots/cloudflared:2026.6.1
+    image: cloudflare/cloudflared:2026.6.1
     restart: unless-stopped
     logging:
       driver: "json-file"
@@ -69,7 +69,7 @@ services:
 
   pihole:
     container_name: pihole
-    image: pihole/pihole:6.4.3
+    image: pihole/pihole:2026.07.2
     restart: unless-stopped
     logging:
       driver: "json-file"
