@@ -1,11 +1,3 @@
-name: 'media'
-
-networks:
-  proxy-net:
-    name: proxy-net
-    driver: bridge
-    external: true
-
 services:
   qbittorrent:
     image: linuxserver/qbittorrent:latest
@@ -15,17 +7,21 @@ services:
     environment:
       - TZ=${TIMEZONE}
       - WEBUI_PORT=8080
-      - PUID=1000
-      - PGID=1000
+      - PUID=${PUID}
+      - PGID=${PGID}
     volumes:
-      - ~/qbittorrent/config:/config
-      - /mnt/dados/media:/downloads
+      - ${QBITTORRENT_CONFIG}:/config
+      - ${MEDIA_PATH}:/downloads
     ports:
-      - '8080:8080'
-      - '62609:62609'
+      - '${TORRENT_PORT}:${TORRENT_PORT}'
+      - '${TORRENT_PORT}:${TORRENT_PORT}/udp'
     networks:
-      - proxy-net
-
+      - services-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   jackett:
     image: ghcr.io/linuxserver/jackett:latest
@@ -34,18 +30,18 @@ services:
     restart: unless-stopped
     environment:
       - TZ=${TIMEZONE}
-      - PUID=1000
-      - PGID=1000
+      - PUID=${PUID}
+      - PGID=${PGID}
     volumes:
-      - ~/jackett/downloads:/downloads
-      - ~/jackett/config:/config
-    ports:
-      - '9117:9117'
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
+      - ${JACKETT_CONFIG}:/config
+      - ${MEDIA_PATH}:/downloads
     networks:
-      - proxy-net
+      - services-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9117"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   bazarr:
     image: ghcr.io/linuxserver/bazarr:latest
@@ -54,15 +50,18 @@ services:
     restart: unless-stopped
     environment:
       - TZ=${TIMEZONE}
-      - PUID=1000
-      - PGID=1000
+      - PUID=${PUID}
+      - PGID=${PGID}
     volumes:
-      - /mnt/dados/media:/movies
-      - ~/bazarr/appdata/config:/config
-    ports:
-      - '6767:6767'
+      - ${MEDIA_PATH}:/movies
+      - ${BAZARR_CONFIG}:/config
     networks:
-      - proxy-net
+      - services-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6767"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   prowlarr:
     image: ghcr.io/hotio/prowlarr:latest
@@ -73,18 +72,18 @@ services:
       - flaresolverr
     environment:
       - TZ=${TIMEZONE}
-      - PUID=1000
-      - PGID=1000
+      - PUID=${PUID}
+      - PGID=${PGID}
     volumes:
-      - ~/prowlarr/config:/config
+      - ${PROWLARR_CONFIG}:/config
       - ./torrentio.yml:/var/lib/Definitions/Custom/torrentio.yml
-    ports:
-      - '9696:9696'
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
     networks:
-      - proxy-net
+      - services-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9696"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
@@ -92,18 +91,21 @@ services:
     container_name: flaresolverr
     restart: unless-stopped
     environment:
-      - LOG_LEVEL=${LOG_LEVEL:-info}
-      - LOG_HTML=${LOG_HTML:-false}
-      - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - LOG_HTML=${LOG_HTML}
+      - CAPTCHA_SOLVER=none
       - TZ=${TIMEZONE}
     volumes:
-      - ~/flaresolverr/config:/config
+      - ${FLARESOLVERR_CONFIG}:/config
     sysctls:
-      - net.ipv6.conf.all.disable_ipv6=1 # Disable ipv6 to prevent some problems
-    ports:
-      - '8191:8191'
+      - net.ipv6.conf.all.disable_ipv6=1
     networks:
-      - proxy-net
+      - services-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8191"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   radarr:
     image: ghcr.io/linuxserver/radarr:latest
@@ -114,15 +116,18 @@ services:
       - qbittorrent
     environment:
       - TZ=${TIMEZONE}
-      - PUID=1000
-      - PGID=1000
+      - PUID=${PUID}
+      - PGID=${PGID}
     volumes:
-      - ~/radarr/appdata/config:/config
-      - /mnt/dados/media:/media
-    ports:
-      - '7878:7878'
+      - ${RADARR_CONFIG}:/config
+      - ${MEDIA_PATH}:/media
     networks:
-      - proxy-net
+      - services-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7878"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   sonarr:
     image: ghcr.io/linuxserver/sonarr:latest
@@ -133,47 +138,15 @@ services:
       - qbittorrent
     environment:
       - TZ=${TIMEZONE}
-      - PUID=1000
-      - PGID=1000
+      - PUID=${PUID}
+      - PGID=${PGID}
     volumes:
-      - ~/sonarr/appdata/config:/config
-      - /mnt/dados/media:/media
-    ports:
-      - '8989:8989'
+      - ${SONARR_CONFIG}:/config
+      - ${MEDIA_PATH}:/media
     networks:
-      - proxy-net
-
-  # sabnzbd:
-  #   image: lscr.io/linuxserver/sabnzbd:latest
-  #   hostname: sabnzbd
-  # container_name: sabnzbd
-  #   restart: unless-stopped
-  #   environment:
-  #     - TZ=${TIMEZONE}
-  #     - PUID=1000
-  #     - PGID=1000
-  #   volumes:
-  #     - /mnt/dados/Downloads/nzbget:/downloads
-  #     - /mnt/dados/Downloads/nzbget/incomplete:/incomplete-downloads
-  #     - ~/nzbget/config:/config
-  #   ports:
-  #     - '6789:6789'
-  #   networks:
-  #     - proxy-net
-
-  # overseerr:
-  #   image: sctx/overseerr
-  #   hostname: overseer
-  # container_name: overseer
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - qbittorrent
-  #   environment:
-  #     - TZ=${TIMEZONE}
-  #     - PORT=5055
-  #   volumes:
-  #     - ~/overseerr/config:/app/config
-  #   ports:
-  #     - '5055:5055'
-  #   networks:
-  #     - proxy-net
+      - services-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8989"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

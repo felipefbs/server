@@ -1,55 +1,72 @@
-name: 'utils'
-
-volumes:
-  portainer_data:
-
-networks:
-  proxy-net:
-    name: proxy-net
-    driver: bridge
-    external: true
-
 services:
   portainer:
     image: portainer/portainer-ce:latest
     hostname: portainer
+    container_name: portainer
     restart: unless-stopped
     volumes:
-      - portainer_data:/data
+      - ${PORTAINER_DATA}:/data
       - /var/run/docker.sock:/var/run/docker.sock
-    # ports:
-    #   - '9000:9000'
     networks:
-      - proxy-net
+      - services-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   librespeed:
     image: lscr.io/linuxserver/librespeed:latest
     hostname: speedtest
+    container_name: speedtest
     restart: unless-stopped
     environment:
-      - TZ=America/Sao_Paulo
-      - PUID=1000
-      - PGID=1000
+      - TZ=${TIMEZONE}
+      - PUID=${PUID}
+      - PGID=${PGID}
     volumes:
-      - /mnt/dados/librespeed:/config
-    # ports:
-    #   - '9091:80'
+      - ${LIBRESPEED_CONFIG}:/config
     networks:
-      - proxy-net
+      - services-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   organizr:
-    image: organizrtools/organizr-v2:armhf
+    image: organizrtools/organizr-v2:latest
     hostname: organizr
-    networks:
-      - proxy-net
+    container_name: organizr
     restart: unless-stopped
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TIMEZONE}
     volumes:
-      - /mnt/dados/organizr:/config
-    # ports:
-    #   - '80:80'
+      - ${ORGANIZR_CONFIG}:/config
     cap_add:
       - NET_BIND_SERVICE
+    networks:
+      - services-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
+  homarr:
+    container_name: homarr
+    image: ghcr.io/ajnart/homarr:latest
+    restart: unless-stopped
+    volumes:
+      - ${HOMARR_CONFIG}/configs:/app/data/configs
+      - ${HOMARR_CONFIG}/icons:/app/public/icons
+      - /var/run/docker.sock:/var/run/docker.sock # Optional: for docker integration
+    networks:
+      - services-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7575"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

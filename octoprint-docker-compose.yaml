@@ -1,49 +1,21 @@
-name: 'octoprint'
-
-networks:
-  proxy-net:
-    name: proxy-net
-    driver: bridge
-    external: true
-
 services:
   octoprint:
     image: octoprint/octoprint
     hostname: octoprint
+    container_name: octoprint
     restart: unless-stopped
-    ports:
-      - 8181:80
     devices:
-    # use `python -m serial.tools.miniterm` to see what the name is of the printer, this requires pyserial
       - /dev/ttyUSB0:/dev/ttyACM0
       - /dev/video0:/dev/video0
-
     volumes:
-     - octoprint:/octoprint
-    # uncomment the lines below to ensure camera streaming is enabled when
-    # you add a video device
+      - ${OCTOPRINT_CONFIG}:/octoprint
     environment:
       - ENABLE_MJPG_STREAMER=true
+      - TZ=${TIMEZONE}
     networks:
-      - proxy-net
-  ####
-  # uncomment if you wish to edit the configuration files of octoprint
-  # refer to docs on configuration editing for more information
-  ####
-
-#  config-editor:
-#    image: linuxserver/code-server
-#    ports:
-#      - 8443:8443
-#    depends_on:
-#      - octoprint
-#    restart: unless-stopped
-#    environment:
-#      - PUID=0
-#      - PGID=0
-#      - TZ=America/Chicago
-#    volumes:
-#      - octoprint:/octoprint
-
-volumes:
-  octoprint:
+      - services-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
