@@ -56,10 +56,39 @@ services:
     networks:
       - services-net
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:7575"]
+      test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
       timeout: 10s
       retries: 3
+
+  homeassistant:
+    container_name: homeassistant
+    image: ghcr.io/home-assistant/home-assistant:stable
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.00'
+          memory: 1G
+    environment:
+      - TZ=${TIMEZONE}
+    volumes:
+      - ${HOMEASSISTANT_CONFIG}:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8123"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 
   speedtest-tracker:
     image: lscr.io/linuxserver/speedtest-tracker:latest

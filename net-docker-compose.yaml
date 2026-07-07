@@ -26,6 +26,10 @@ services:
         condition: service_healthy
       speedtest-tracker:
         condition: service_healthy
+      homeassistant:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "80:80"
     volumes:
