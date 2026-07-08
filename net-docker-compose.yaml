@@ -49,6 +49,7 @@ services:
       FTLCONF_dns_listeningMode: 'ALL'
     volumes:
       - '${PIHOLE_CONFIG}:/etc/pihole'
+      - './99-wildcard.conf:/etc/dnsmasq.d/99-wildcard.conf:ro'
     cap_add:
       - NET_ADMIN
       - SYS_TIME
