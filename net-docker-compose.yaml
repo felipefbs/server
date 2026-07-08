@@ -109,7 +109,7 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - APP_KEY=${SPEEDTEST_TRACKER_APP_KEY}
-      - APP_URL=http://speedtest-tracker.local
+      - APP_URL=http://speedtest-tracker.home
       - DB_CONNECTION=sqlite
       - SPEEDTEST_SCHEDULE=${SPEEDTEST_TRACKER_SCHEDULE}
       - APP_TIMEZONE=${TIMEZONE}
