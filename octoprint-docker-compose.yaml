@@ -14,9 +14,6 @@ services:
         limits:
           cpus: '1.0'
           memory: 1G
-    depends_on:
-      pihole:
-        condition: service_healthy
     devices:
       - /dev/ttyUSB0:/dev/ttyACM0
       - /dev/video0:/dev/video0

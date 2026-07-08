@@ -14,10 +14,8 @@ services:
         limits:
           cpus: '1.0'
           memory: 1G
-    depends_on:
-      pihole:
-        condition: service_healthy
     environment:
+
       - TZ=${TIMEZONE}
       - WEBUI_PORT=8080
       - PUID=${PUID}
@@ -51,9 +49,6 @@ services:
         limits:
           cpus: '0.50'
           memory: 512M
-    depends_on:
-      pihole:
-        condition: service_healthy
     environment:
       - TZ=${TIMEZONE}
       - PUID=${PUID}
@@ -84,9 +79,6 @@ services:
         limits:
           cpus: '0.50'
           memory: 512M
-    depends_on:
-      pihole:
-        condition: service_healthy
     environment:
       - TZ=${TIMEZONE}
       - PUID=${PUID}
@@ -118,16 +110,9 @@ services:
           cpus: '0.50'
           memory: 512M
     depends_on:
-      pihole:
-        condition: service_healthy
       flaresolverr:
         condition: service_healthy
     environment:
-      - TZ=${TIMEZONE}
-      - PUID=${PUID}
-      - PGID=${PGID}
-    volumes:
-      - ${PROWLARR_CONFIG}:/config
       - ./torrentio.yml:/var/lib/Definitions/Custom/torrentio.yml
     networks:
       - services-net
@@ -152,9 +137,6 @@ services:
         limits:
           cpus: '0.50'
           memory: 512M
-    depends_on:
-      pihole:
-        condition: service_healthy
     environment:
       - LOG_LEVEL=${LOG_LEVEL}
       - LOG_HTML=${LOG_HTML}
@@ -188,8 +170,6 @@ services:
           cpus: '0.75'
           memory: 1G
     depends_on:
-      pihole:
-        condition: service_healthy
       qbittorrent:
         condition: service_healthy
     environment:
@@ -223,8 +203,6 @@ services:
           cpus: '0.75'
           memory: 1G
     depends_on:
-      pihole:
-        condition: service_healthy
       qbittorrent:
         condition: service_healthy
     environment:

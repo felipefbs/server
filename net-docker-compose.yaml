@@ -13,9 +13,6 @@ services:
         limits:
           cpus: '0.25'
           memory: 128M
-    depends_on:
-      pihole:
-        condition: service_healthy
     environment:
       - UPSTREAM1=https://1.1.1.1/dns-query
       - UPSTREAM2=https://1.0.0.1/dns-query
