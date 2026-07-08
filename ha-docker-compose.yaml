@@ -4,7 +4,10 @@ services:
     image: ghcr.io/home-assistant/home-assistant:stable
     restart: unless-stopped
     privileged: true
-    network_mode: host
+    ports:
+      - "8123:8123"
+    networks:
+      - services-net
     logging:
       driver: "json-file"
       options:
@@ -23,6 +26,38 @@ services:
       - /run/dbus:/run/dbus:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8123"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  esphome:
+    container_name: esphome
+    image: ghcr.io/esphome/esphome:latest
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - "6052:6052"
+    networks:
+      - services-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 1G
+    environment:
+      - USERNAME=${ESPHOME_USERNAME}
+      - PASSWORD=${ESPHOME_PASSWORD}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ${ESPHOME_CONFIG}:/config
+      - /etc/localtime:/etc/localtime:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:6052 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
