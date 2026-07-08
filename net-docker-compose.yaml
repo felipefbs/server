@@ -107,3 +107,64 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+
+  librespeed:
+    image: lscr.io/linuxserver/librespeed:6.1.0
+    hostname: speedtest
+    container_name: speedtest
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+    environment:
+      - TZ=${TIMEZONE}
+      - PUID=${PUID}
+      - PGID=${PGID}
+    volumes:
+      - ${LIBRESPEED_CONFIG}:/config
+    networks:
+      - services-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  speedtest-tracker:
+    image: lscr.io/linuxserver/speedtest-tracker:latest
+    container_name: speedtest-tracker
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - APP_KEY=${SPEEDTEST_TRACKER_APP_KEY}
+      - APP_URL=http://speedtest-tracker.local
+      - DB_CONNECTION=sqlite
+      - SPEEDTEST_SCHEDULE=${SPEEDTEST_TRACKER_SCHEDULE}
+      - APP_TIMEZONE=${TIMEZONE}
+    volumes:
+      - ${SPEEDTEST_TRACKER_CONFIG}:/config
+    networks:
+      - services-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
