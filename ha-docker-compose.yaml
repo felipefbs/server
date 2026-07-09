@@ -50,8 +50,8 @@ services:
           cpus: '0.50'
           memory: 1G
     environment:
-      - USERNAME=${ESPHOME_USERNAME}
-      - PASSWORD=${ESPHOME_PASSWORD}
+      - ESPHOME_USERNAME=${ESPHOME_USERNAME}
+      - ESPHOME_PASSWORD=${ESPHOME_PASSWORD}
       - TZ=${TIMEZONE}
     volumes:
       - ${ESPHOME_CONFIG}:/config
