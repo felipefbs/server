@@ -1,8 +1,9 @@
 services:
-  cloudflared:
-    container_name: cloudflared
-    image: visibilityspots/cloudflared:latest
+  dnscrypt-proxy:
+    container_name: dnscrypt-proxy
+    image: klutchell/dnscrypt-proxy:latest
     restart: unless-stopped
+    hostname: encrypted-dns
     logging:
       driver: "json-file"
       options:
@@ -13,15 +14,12 @@ services:
         limits:
           cpus: '0.25'
           memory: 128M
-    environment:
-      - UPSTREAM1=https://1.1.1.1/dns-query
-      - UPSTREAM2=https://1.0.0.1/dns-query
-      - PORT=5054
-      - ADDRESS=0.0.0.0
+    volumes:
+      - ${CONFIG_PATH}/dnscrypt-proxy:/config
     networks:
       - services-net
     healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 5054 || exit 1"]
+      test: ["CMD", "dnscrypt-proxy", "-config", "/config/dnscrypt-proxy.toml", "-check"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -47,6 +45,7 @@ services:
       TZ: '${TIMEZONE}'
       FTLCONF_webserver_api_password: ${PIHOLE_PWD}
       FTLCONF_dns_listeningMode: 'ALL'
+      FTLCONF_dns_upstreams: 'encrypted-dns#5054'
     volumes:
       - '${PIHOLE_CONFIG}:/etc/pihole'
       - './99-wildcard.conf:/etc/dnsmasq.d/99-wildcard.conf:ro'
