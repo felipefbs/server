@@ -1,0 +1,45 @@
+# ==========================================
+# Configurações Globais e de Rede
+# ==========================================
+server_names = ['wikimedia', 'cloudflare', 'cloudflare-ipv6', 'quad9-dnscrypt-ip4-nofilter-ecs-pri', 'quad9-doh-ip4-port443-nofilter-ecs-pri']
+listen_addresses = ['0.0.0.0:5054']
+max_clients = 250
+
+ipv4_servers = true
+ipv6_servers = true
+dnscrypt_servers = true
+doh_servers = true
+
+# ==========================================
+# Filtros de Privacidade e Segurança
+# ==========================================
+require_dnssec = true
+require_nolog = true
+require_nofilter = true
+
+# ==========================================
+# Balanceamento de Carga e Performance
+# ==========================================
+# O wp2 (Weighted Power of Two) escolhe os servidores mais rápidos baseados no seu ping real
+lb_strategy = 'wp2'
+lb_estimator = true
+
+# Cache desativado pois o pihole funciona como cache
+cache = false
+
+
+# ==========================================
+# Fontes de Servidores (Atualização Automática)
+# ==========================================
+[sources]
+
+[sources.public-resolvers]
+urls = [
+  'https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/public-resolvers.md',
+  'https://download.dnscrypt.info/resolvers-list/v3/public-resolvers.md',
+  'https://cdn.jsdelivr.net/gh/DNSCrypt/dnscrypt-resolvers@master/v3/public-resolvers.md'
+]
+cache_file = 'public-resolvers.md'
+minisign_key = 'RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3'
+refresh_delay = 73
+prefix = ''
