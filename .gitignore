@@ -1,5 +1,3 @@
-etc-pihole
 .env
-pihole_lists
-to_disable
-configs
+**/data/**
+old_configs

@@ -21,7 +21,7 @@ services:
     environment:
       - TZ=${TIMEZONE}
     volumes:
-      - ${HOMEASSISTANT_CONFIG}:/config
+      - ${HOMEASSISTANT_DATA}:/config
       - /etc/localtime:/etc/localtime:ro
       - /run/dbus:/run/dbus:ro
     healthcheck:
@@ -54,7 +54,7 @@ services:
       - ESPHOME_PASSWORD=${ESPHOME_PASSWORD}
       - TZ=${TIMEZONE}
     volumes:
-      - ${ESPHOME_CONFIG}:/config
+      - ${ESPHOME_DATA}:/config
       - /etc/localtime:/etc/localtime:ro
     healthcheck:
       test: ["CMD-SHELL", "wget --spider -q http://localhost:6052 || exit 1"]

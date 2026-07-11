@@ -21,7 +21,7 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
     volumes:
-      - ${QBITTORRENT_CONFIG}:/config
+      - ${QBITTORRENT_DATA}:/config
       - ${MEDIA_PATH}:/downloads
     ports:
       - '${TORRENT_PORT}:${TORRENT_PORT}'
@@ -54,7 +54,7 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
     volumes:
-      - ${JACKETT_CONFIG}:/config
+      - ${JACKETT_DATA}:/config
       - ${MEDIA_PATH}:/downloads
     networks:
       - services-net
@@ -85,7 +85,7 @@ services:
       - PGID=${PGID}
     volumes:
       - ${MEDIA_PATH}:/movies
-      - ${BAZARR_CONFIG}:/config
+      - ${BAZARR_DATA}:/config
     networks:
       - services-net
     healthcheck:
@@ -143,7 +143,7 @@ services:
       - CAPTCHA_SOLVER=none
       - TZ=${TIMEZONE}
     volumes:
-      - ${FLARESOLVERR_CONFIG}:/config
+      - ${FLARESOLVERR_DATA}:/config
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=1
     networks:
@@ -177,7 +177,7 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
     volumes:
-      - ${RADARR_CONFIG}:/config
+      - ${RADARR_DATA}:/config
       - ${MEDIA_PATH}:/media
     networks:
       - services-net
@@ -210,7 +210,7 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
     volumes:
-      - ${SONARR_CONFIG}:/config
+      - ${SONARR_DATA}:/config
       - ${MEDIA_PATH}:/media
     networks:
       - services-net

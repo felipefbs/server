@@ -15,7 +15,7 @@ services:
           cpus: '0.25'
           memory: 128M
     volumes:
-      - ${CONFIG_PATH}/dnscrypt-proxy:/config
+      - ${DNSCRYPT_CONFIG}:/config
     networks:
       - services-net
     healthcheck:
@@ -47,8 +47,8 @@ services:
       FTLCONF_dns_listeningMode: 'ALL'
       FTLCONF_dns_upstreams: 'encrypted-dns#5054'
     volumes:
-      - '${PIHOLE_CONFIG}:/etc/pihole'
-      - './99-wildcard.conf:/etc/dnsmasq.d/99-wildcard.conf:ro'
+      - '${PIHOLE_DATA}:/etc/pihole'
+      - '${PIHOLE_CONFIG}/99-wildcard.conf:/etc/dnsmasq.d/99-wildcard.conf:ro'
     cap_add:
       - NET_ADMIN
       - SYS_TIME
@@ -80,8 +80,6 @@ services:
       - TZ=${TIMEZONE}
       - PUID=${PUID}
       - PGID=${PGID}
-    volumes:
-      - ${LIBRESPEED_CONFIG}:/config
     networks:
       - services-net
     healthcheck:
@@ -113,7 +111,7 @@ services:
       - SPEEDTEST_SCHEDULE=${SPEEDTEST_TRACKER_SCHEDULE}
       - APP_TIMEZONE=${TIMEZONE}
     volumes:
-      - ${SPEEDTEST_TRACKER_CONFIG}:/config
+      - ${SPEEDTEST_TRACKER_DATA}:/config
     networks:
       - services-net
     healthcheck:

@@ -16,9 +16,9 @@ services:
           memory: 1G
     devices:
       - /dev/ttyUSB0:/dev/ttyACM0
-      - /dev/video0:/dev/video0
+      # - /dev/video0:/dev/video0
     volumes:
-      - ${OCTOPRINT_CONFIG}:/octoprint
+      - ${OCTOPRINT_DATA}:/octoprint
     environment:
       - ENABLE_MJPG_STREAMER=true
       - TZ=${TIMEZONE}

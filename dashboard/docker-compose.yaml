@@ -16,7 +16,7 @@ services:
     environment:
       - SECRET_ENCRYPTION_KEY=${AUTH_SECRET}
     volumes:
-      - ${HOMARR_CONFIG}/appdata:/appdata
+      - ${HOMARR_DATA}/appdata:/appdata
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - services-net
