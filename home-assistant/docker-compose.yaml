@@ -25,7 +25,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /run/dbus:/run/dbus:ro
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8123"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8123"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -47,7 +47,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.50'
+          # cpus: '0.50'
           memory: 1G
     environment:
       - ESPHOME_USERNAME=${ESPHOME_USERNAME}
@@ -57,7 +57,7 @@ services:
       - ${ESPHOME_DATA}:/config
       - /etc/localtime:/etc/localtime:ro
     healthcheck:
-      test: ["CMD-SHELL", "wget --spider -q http://localhost:6052 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://127.0.0.1:6052 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
