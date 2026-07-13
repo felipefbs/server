@@ -1,9 +1,11 @@
 services:
   qbittorrent:
-    image: linuxserver/qbittorrent:latest
+    image: lscr.io/linuxserver/qbittorrent:${QBIT_VER}
     restart: unless-stopped
     hostname: torrent
     container_name: torrent
+    security_opt:
+      - no-new-privileges:true
     logging:
       driver: "json-file"
       options:
@@ -15,14 +17,13 @@ services:
           cpus: '1.0'
           memory: 1G
     environment:
-
       - TZ=${TIMEZONE}
       - WEBUI_PORT=8080
       - PUID=${PUID}
       - PGID=${PGID}
     volumes:
-      - ${QBITTORRENT_DATA}:/config
-      - ${MEDIA_PATH}:/downloads
+      - ${BASE_DATA_DIR}/qbittorrent:/config
+      - ${BASE_MEDIA_DIR}:/downloads
     ports:
       - '${TORRENT_PORT}:${TORRENT_PORT}'
       - '${TORRENT_PORT}:${TORRENT_PORT}/udp'
@@ -35,10 +36,12 @@ services:
       retries: 3
 
   jackett:
-    image: ghcr.io/linuxserver/jackett:latest
+    image: lscr.io/linuxserver/jackett:${JACKETT_VER}
     hostname: jackett
     container_name: jackett
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     logging:
       driver: "json-file"
       options:
@@ -54,8 +57,8 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
     volumes:
-      - ${JACKETT_DATA}:/config
-      - ${MEDIA_PATH}:/downloads
+      - ${BASE_DATA_DIR}/jackett:/config
+      - ${BASE_MEDIA_DIR}:/downloads
     networks:
       - services-net
     healthcheck:
@@ -65,10 +68,12 @@ services:
       retries: 3
 
   bazarr:
-    image: ghcr.io/linuxserver/bazarr:latest
+    image: lscr.io/linuxserver/bazarr:${BAZARR_VER}
     hostname: bazarr
     container_name: bazarr
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     logging:
       driver: "json-file"
       options:
@@ -84,8 +89,8 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
     volumes:
-      - ${MEDIA_PATH}:/movies
-      - ${BAZARR_DATA}:/config
+      - ${BASE_DATA_DIR}/bazarr:/config
+      - ${BASE_MEDIA_DIR}:/movies
     networks:
       - services-net
     healthcheck:
@@ -95,10 +100,12 @@ services:
       retries: 3
 
   prowlarr:
-    image: ghcr.io/hotio/prowlarr:latest
+    image: ghcr.io/hotio/prowlarr:${PROWLARR_VER}
     hostname: prowlarr
     container_name: prowlarr
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     logging:
       driver: "json-file"
       options:
@@ -113,7 +120,12 @@ services:
       flaresolverr:
         condition: service_healthy
     environment:
-      - ./torrentio.yml:/var/lib/Definitions/Custom/torrentio.yml
+      - TZ=${TIMEZONE}
+      - PUID=${PUID}
+      - PGID=${PGID}
+    volumes:
+      - ${BASE_DATA_DIR}/prowlarr:/config
+      - ${BASE_CONFIG_DIR}/prowlarr/torrentio.yml:/var/lib/Definitions/Custom/torrentio.yml:ro
     networks:
       - services-net
     healthcheck:
@@ -123,7 +135,7 @@ services:
       retries: 3
 
   flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr:latest
+    image: ghcr.io/flaresolverr/flaresolverr:${FLARESOLVERR_VER}
     hostname: flaresolverr
     container_name: flaresolverr
     restart: unless-stopped
@@ -143,7 +155,7 @@ services:
       - CAPTCHA_SOLVER=none
       - TZ=${TIMEZONE}
     volumes:
-      - ${FLARESOLVERR_DATA}:/config
+      - ${BASE_DATA_DIR}/flaresolverr:/config
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=1
     networks:
@@ -155,10 +167,12 @@ services:
       retries: 3
 
   radarr:
-    image: ghcr.io/linuxserver/radarr:latest
+    image: lscr.io/linuxserver/radarr:${RADARR_VER}
     hostname: radarr
     container_name: radarr
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     logging:
       driver: "json-file"
       options:
@@ -177,8 +191,8 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
     volumes:
-      - ${RADARR_DATA}:/config
-      - ${MEDIA_PATH}:/media
+      - ${BASE_DATA_DIR}/radarr:/config
+      - ${BASE_MEDIA_DIR}:/media
     networks:
       - services-net
     healthcheck:
@@ -188,10 +202,12 @@ services:
       retries: 3
 
   sonarr:
-    image: ghcr.io/linuxserver/sonarr:latest
+    image: lscr.io/linuxserver/sonarr:${SONARR_VER}
     hostname: sonarr
     container_name: sonarr
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     logging:
       driver: "json-file"
       options:
@@ -210,8 +226,8 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
     volumes:
-      - ${SONARR_DATA}:/config
-      - ${MEDIA_PATH}:/media
+      - ${BASE_DATA_DIR}/sonarr:/config
+      - ${BASE_MEDIA_DIR}:/media
     networks:
       - services-net
     healthcheck:

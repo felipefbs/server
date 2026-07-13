@@ -1,8 +1,10 @@
 services:
   homarr:
     container_name: homarr
-    image: ghcr.io/homarr-labs/homarr:latest
+    image: ghcr.io/homarr-labs/homarr:${HOMARR_VER}
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     logging:
       driver: "json-file"
       options:
@@ -16,8 +18,8 @@ services:
     environment:
       - SECRET_ENCRYPTION_KEY=${AUTH_SECRET}
     volumes:
-      - ${HOMARR_DATA}/appdata:/appdata
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ${BASE_DATA_DIR}/homarr/appdata:/appdata
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - services-net
     healthcheck:

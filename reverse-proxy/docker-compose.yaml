@@ -1,8 +1,10 @@
 services:
   nginx:
-    image: nginx:1.31.2
+    image: nginx:${NGINX_VER}
     container_name: nginx
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     logging:
       driver: "json-file"
       options:
@@ -13,12 +15,10 @@ services:
         limits:
           cpus: '0.25'
           memory: 128M
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     ports:
       - "80:80"
     volumes:
-      - ${NGINX_CONFIG}/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${BASE_CONFIG_DIR}/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
       - proxy-net
       - services-net

@@ -1,9 +1,11 @@
 services:
   dnscrypt-proxy:
     container_name: dnscrypt-proxy
-    image: klutchell/dnscrypt-proxy:latest
+    image: klutchell/dnscrypt-proxy:${DNSCRYPT_VER}
     restart: unless-stopped
     hostname: encrypted-dns
+    security_opt:
+      - no-new-privileges:true
     logging:
       driver: "json-file"
       options:
@@ -15,7 +17,7 @@ services:
           cpus: '0.25'
           memory: 128M
     volumes:
-      - ${DNSCRYPT_CONFIG}:/config
+      - ${BASE_CONFIG_DIR}/dnscrypt-proxy:/config
     networks:
       - services-net
     healthcheck:
@@ -26,8 +28,10 @@ services:
 
   pihole:
     container_name: pihole
-    image: pihole/pihole:2026.07.2
+    image: pihole/pihole:${PIHOLE_VER}
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     logging:
       driver: "json-file"
       options:
@@ -43,16 +47,14 @@ services:
       - "53:53/udp"
     environment:
       TZ: '${TIMEZONE}'
-      FTLCONF_webserver_api_password: ${PIHOLE_PWD}
+      WEBPASSWORD: ${PIHOLE_PWD}
       FTLCONF_dns_listeningMode: 'ALL'
-      FTLCONF_dns_upstreams: 'encrypted-dns#5054'
+      FTLCONF_dns_upstreams: 'dnscrypt-proxy#5054'
     volumes:
-      - '${PIHOLE_DATA}:/etc/pihole'
-      - '${PIHOLE_CONFIG}/99-wildcard.conf:/etc/dnsmasq.d/99-wildcard.conf:ro'
+      - '${BASE_DATA_DIR}/pihole:/etc/pihole'
+      - '${BASE_CONFIG_DIR}/pihole/99-wildcard.conf:/etc/dnsmasq.d/99-wildcard.conf:ro'
     cap_add:
       - NET_ADMIN
-      - SYS_TIME
-      - SYS_NICE
     networks:
       - services-net
     healthcheck:
@@ -66,6 +68,8 @@ services:
     hostname: speedtest
     container_name: speedtest
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     logging:
       driver: "json-file"
       options:
@@ -89,9 +93,11 @@ services:
       retries: 3
 
   speedtest-tracker:
-    image: lscr.io/linuxserver/speedtest-tracker:latest
+    image: lscr.io/linuxserver/speedtest-tracker:${SPEEDTEST_TRACKER_VER}
     container_name: speedtest-tracker
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     logging:
       driver: "json-file"
       options:
@@ -111,7 +117,7 @@ services:
       - SPEEDTEST_SCHEDULE=${SPEEDTEST_TRACKER_SCHEDULE}
       - APP_TIMEZONE=${TIMEZONE}
     volumes:
-      - ${SPEEDTEST_TRACKER_DATA}:/config
+      - ${BASE_DATA_DIR}/speedtest-tracker:/config
     networks:
       - services-net
     healthcheck:
