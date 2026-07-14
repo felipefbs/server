@@ -15,3 +15,4 @@ include:
   - path: home-assistant/docker-compose.yaml
   - path: dashboard/docker-compose.yaml
   - path: octoprint/docker-compose.yaml
+  - path: paperless/docker-compose.yaml
