@@ -9,9 +9,9 @@ networks:
     internal: false # Needs internet for updates/downloads, but not exposed to host
 
 include:
-  - path: rproxy-docker-compose.yaml
-  - path: net-docker-compose.yaml
-  - path: media-docker-compose.yaml
-  - path: ha-docker-compose.yaml
-  - path: utils-docker-compose.yaml
-  - path: octoprint-docker-compose.yaml
+  - path: reverse-proxy/docker-compose.yaml
+  - path: network/docker-compose.yaml
+  - path: media/docker-compose.yaml
+  - path: home-assistant/docker-compose.yaml
+  - path: dashboard/docker-compose.yaml
+  - path: octoprint/docker-compose.yaml

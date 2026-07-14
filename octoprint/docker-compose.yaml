@@ -1,6 +1,6 @@
 services:
   octoprint:
-    image: octoprint/octoprint:1.11.8
+    image: octoprint/octoprint:${OCTOPRINT_VER}
     hostname: octoprint
     container_name: octoprint
     restart: unless-stopped
@@ -18,7 +18,7 @@ services:
       - /dev/ttyUSB0:/dev/ttyACM0
       - /dev/video0:/dev/video0
     volumes:
-      - ${OCTOPRINT_CONFIG}:/octoprint
+      - ${BASE_DATA_DIR}/octoprint:/octoprint
     environment:
       - ENABLE_MJPG_STREAMER=true
       - TZ=${TIMEZONE}
