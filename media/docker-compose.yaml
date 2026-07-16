@@ -59,6 +59,8 @@ services:
     volumes:
       - ${BASE_DATA_DIR}/jackett:/config
       - ${BASE_MEDIA_DIR}:/downloads
+    ports:
+      - '9117:9117'
     networks:
       - services-net
     healthcheck:
@@ -91,6 +93,8 @@ services:
     volumes:
       - ${BASE_DATA_DIR}/bazarr:/config
       - ${BASE_MEDIA_DIR}:/movies
+    ports:
+      - '6767:6767'
     networks:
       - services-net
     healthcheck:
@@ -126,6 +130,8 @@ services:
     volumes:
       - ${BASE_DATA_DIR}/prowlarr:/config
       - ${BASE_CONFIG_DIR}/prowlarr/torrentio.yml:/var/lib/Definitions/Custom/torrentio.yml:ro
+    ports:
+      - '9696:9696'
     networks:
       - services-net
     healthcheck:
@@ -156,6 +162,8 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - ${BASE_DATA_DIR}/flaresolverr:/config
+    ports:
+      - '8191:8191'
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=1
     networks:
@@ -193,6 +201,8 @@ services:
     volumes:
       - ${BASE_DATA_DIR}/radarr:/config
       - ${BASE_MEDIA_DIR}:/media
+    ports:
+      - '7878:7878'
     networks:
       - services-net
     healthcheck:
@@ -228,6 +238,8 @@ services:
     volumes:
       - ${BASE_DATA_DIR}/sonarr:/config
       - ${BASE_MEDIA_DIR}:/media
+    ports:
+      - '8989:8989'
     networks:
       - services-net
     healthcheck:
