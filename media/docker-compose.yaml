@@ -27,6 +27,7 @@ services:
     ports:
       - '${TORRENT_PORT}:${TORRENT_PORT}'
       - '${TORRENT_PORT}:${TORRENT_PORT}/udp'
+      - '8080:8080'
     networks:
       - services-net
     healthcheck:
@@ -244,6 +245,113 @@ services:
       - services-net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8989"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  seerr:
+    image: ghcr.io/seerr-team/seerr:${SEERR_VER}
+    container_name: seerr
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+    environment:
+      - LOG_LEVEL=debug
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ${BASE_DATA_DIR}/seerr:/app/config
+    ports:
+      - "9957:5055"
+    networks:
+      - services-net
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5055/api/v1/status"]
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
+
+  navidrome:
+    image: deluan/navidrome:${NAVIDROME_VER}
+    container_name: navidrome
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TIMEZONE}
+      - ND_SCANSCHEDULE=1h
+      - ND_LOGLEVEL=info
+    volumes:
+      - ${BASE_DATA_DIR}/navidrome:/data
+      - ${BASE_MEDIA_DIR}/musics:/music:ro
+    ports:
+      - "9962:4533"
+    networks:
+      - services-net
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4533/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  jellyfin:
+    image: jellyfin/jellyfin:${JELLYFIN_VER}
+    container_name: jellyfin
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4G
+    ports:
+      - "9920:8096"
+      - "7360:7359/udp"
+    volumes:
+      - ${BASE_DATA_DIR}/jellyfin/config:/config
+      - ${BASE_DATA_DIR}/jellyfin/cache:/cache
+      - type: bind
+        source: ${BASE_MEDIA_DIR}/videos
+        target: /media/videos
+      - type: bind
+        source: ${BASE_MEDIA_DIR}/fonts
+        target: /usr/local/share/fonts/custom
+        read_only: true
+    environment:
+      - JELLYFIN_PublishedServerUrl=${JELLYFIN_URL:-}
+      - TZ=${TIMEZONE}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - services-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8096/health"]
       interval: 30s
       timeout: 10s
       retries: 3
